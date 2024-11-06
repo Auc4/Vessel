@@ -10,12 +10,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetUsuarios obtiene todos los usuarios desde Pocketbase y los envía al cliente.
 func GetUsuarios(c *gin.Context) {
-	// URL del endpoint de Pocketbase para obtener la colección de usuarios
+
 	url := "http://127.0.0.1:8090/api/collections/Usuario/records"
 
-	// Realiza la petición GET a Pocketbase
 	resp, err := http.Get(url)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al conectar con Pocketbase"})
@@ -24,14 +22,12 @@ func GetUsuarios(c *gin.Context) {
 
 	defer resp.Body.Close()
 
-	// Lee la respuesta y conviértela a JSON
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al leer la respuesta de Pocketbase"})
 		return
 	}
 
-	// Envía el resultado al cliente como JSON
 	c.Header("Content-Type", "application/json")
 	c.String(http.StatusOK, string(body))
 

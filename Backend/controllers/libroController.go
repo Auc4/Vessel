@@ -12,13 +12,11 @@ import (
 )
 
 func GetLibros(c *gin.Context) {
-	// Extrae el idUsuario de los parámetros de la URL
+
 	id_usuario := c.Param("id_usuario")
 
-	// Construye la URL con el filtro de idUsuario
 	url := fmt.Sprintf("http://127.0.0.1:8090/api/collections/Libro/records?filter=(id_usuario='%s')", id_usuario)
 
-	// Realiza la petición GET a Pocketbase
 	resp, err := http.Get(url)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al conectar con Pocketbase"})
@@ -27,7 +25,6 @@ func GetLibros(c *gin.Context) {
 
 	defer resp.Body.Close()
 
-	// Lee la respuesta y envíala como JSON al cliente
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al leer la respuesta de Pocketbase"})
