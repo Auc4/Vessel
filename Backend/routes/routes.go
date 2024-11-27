@@ -7,9 +7,16 @@ import (
 
 func SetUpRoutes(router *gin.Engine) {
 
-	router.GET("/api/usuarios", controllers.GetUsuarios)
-	router.POST("/api/crear_usuario", controllers.PostUsuario)
-	router.GET("/api/libros/usuario/:id_usuario", controllers.GetLibros)
-	router.POST("/api/crear_libro", controllers.PostLibro)
+	usuario := router.Group("/api/usuario")
+	{
+		usuario.GET("/obtener_usuario/:id", controllers.GetUsuarioByID)
+		usuario.POST("/crear_usuario", controllers.PostUsuario)
+		usuario.PUT("/actualizar_usuario/:id", controllers.PutUsuario)
+		usuario.DELETE("/borrar_usuario/:id", controllers.DeleteUsuario)
+	}
 
+	libro := router.Group("/api/libros")
+	{
+		libro.GET("/obtener_libros/:id")
+	}
 }
