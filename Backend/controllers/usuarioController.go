@@ -12,9 +12,11 @@ func GetUsuarioByID(c *gin.Context) {
 
 	var usuario entities.Usuario
 
+	Query := "SELECT Nombre_usuario, Password_usuario, Email FROM usuario WHERE Usuario_ID = ?;"
+
 	UsuarioID := c.Param("id")
 
-	err := DB.QueryRow("SELECT Nombre_usuario, Password_usuario, Email FROM usuario WHERE Usuario_ID = ?;", UsuarioID).Scan(&usuario.NombreUsuario, &usuario.PasswordUsuario, &usuario.Email)
+	err := DB.QueryRow(Query, UsuarioID).Scan(&usuario.NombreUsuario, &usuario.PasswordUsuario, &usuario.Email)
 
 	if err != nil {
 		log.Println("Error al consultar los datos del usuario", err)
@@ -29,6 +31,8 @@ func GetUsuarioByID(c *gin.Context) {
 func PostUsuario(c *gin.Context) {
 
 	var usuario entities.Usuario
+
+	var errores []string
 
 	// Pasar el formato JSON a la estructura del usuario
 	if err := c.ShouldBindJSON(&usuario); err != nil {
@@ -62,6 +66,20 @@ func PostUsuario(c *gin.Context) {
 		return
 	}
 
+	//Validaciones para verificar si los datos han sido ubicados correctamente
+
+	if usuario.NombreUsuario == "" {
+		errores = append(errores, "Se debe ubicar un nombre de usuario")
+	}
+	if usuario.Email == "" {
+		errores = append(errores, "Se debe ubicar un email para registrarse")
+	}
+
+	if len(errores) > 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": errores})
+		return
+	}
+
 	// Inserción del usuario en la base de datos
 	_, err = DB.Exec("INSERT INTO usuario (Nombre_usuario, Password_usuario, Email) VALUES (?, ?, ?);", usuario.NombreUsuario, usuario.PasswordUsuario, usuario.Email)
 	if err != nil {
@@ -81,6 +99,9 @@ func PutUsuario(c *gin.Context) {
 	UsuarioID := c.Param("id")
 
 	var usuario entities.Usuario
+
+	Query := "UPDATE usuario SET Nombre_usuario = ?, Password_usuario = ?, Email = ? WHERE Usuario_ID = ?;"
+
 	var errores []string
 
 	if err := c.ShouldBindJSON(&usuario); err != nil {
@@ -103,10 +124,10 @@ func PutUsuario(c *gin.Context) {
 		return
 	}
 
-	_, err := DB.Exec("UPDATE usuario SET Nombre_usuario = ?, Password_usuario = ?, Email = ? WHERE Usuario_ID = ?;", usuario.NombreUsuario, usuario.PasswordUsuario, usuario.Email, UsuarioID)
+	_, err := DB.Exec(Query, usuario.NombreUsuario, usuario.PasswordUsuario, usuario.Email, UsuarioID)
 	if err != nil {
 		log.Println("Error al actualizar el usuario", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Error al actualizar el usuario"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al actualizar el usuario"})
 		return
 	}
 
@@ -117,9 +138,11 @@ func DeleteUsuario(c *gin.Context) {
 
 	UsuarioID := c.Param("id")
 
+	Query := "SELECT COUNT(*) FROM usuario WHERE Usuario_ID = ?"
+
 	//Verifica si el usuario existe antes de eliminarlo
 	var count int
-	err := DB.QueryRow("SELECT COUNT(*) FROM usuario WHERE Usuario_ID = ?", UsuarioID).Scan(&count)
+	err := DB.QueryRow(Query, UsuarioID).Scan(&count)
 	if err != nil {
 		log.Println("Error al verificar la existencia del usuario:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error interno del servidor"})
@@ -130,8 +153,10 @@ func DeleteUsuario(c *gin.Context) {
 		return
 	}
 
+	Query = "DELETE FROM usuario WHERE Usuario_ID = ?"
+
 	//Ejecución del Query
-	_, err = DB.Exec("DELETE FROM usuario WHERE Usuario_ID = ?", UsuarioID)
+	_, err = DB.Exec(Query, UsuarioID)
 	if err != nil {
 		log.Println("Error al eliminar el usuario", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Error al eliminar el usuario"})

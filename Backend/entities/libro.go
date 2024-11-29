@@ -1,9 +1,17 @@
 package entities
 
 type Libro struct {
-	IDUsuario        string `json:"id_usuario"`
-	TituloLibro      string `json:"titulo_libro"`
-	AutorLibro       string `json:"autor_libro"`
-	FechaPublicacion string `json:"fecha_publicacion"`
+	Usuario_ID       int    `json:"usuario_ID"`
+	TituloLibro      string `json:"titulo"`
+	AutorLibro       string `json:"autor"`
+	FechaPublicacion int16  `json:"año_publicacion"`
 	Favorito         bool   `json:"favorito"`
+}
+
+type FocusedLibro struct {
+	TituloLibro      string   `json:"titulo"`
+	AutorLibro       string   `json:"autor"`
+	FechaPublicacion int16    `json:"año_publicacion"`
+	Favorito         bool     `json:"favorito"`
+	Etiquetas        []string `json:"etiquetas"`
 }
