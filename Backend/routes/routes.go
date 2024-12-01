@@ -19,7 +19,8 @@ func SetUpRoutes(router *gin.Engine) {
 	{
 		libro.GET("/obtener_libros/:id", controllers.GetLibros)
 		libro.GET("/obtener_libro/:usuario_id/:libro_id", controllers.GetLibroById)
-		libro.PUT("/crear_libro", controllers.PostLibro)
+		libro.POST("/crear_libro", controllers.PostLibro)
+		libro.PUT("/actualizar_libro/:usuario_id/:libro_id", controllers.PutLibro)
 		libro.DELETE("/borrar_libro/:usuario_id/:libro_id", controllers.DeleteLibro)
 	}
 

@@ -93,6 +93,47 @@ func PostLibro(c *gin.Context) {
 
 }
 
+func PutLibro(c *gin.Context) {
+
+	UsuarioID := c.Param("usuario_id")
+	LibroID := c.Param("libro_id")
+
+	var libro entities.Libro
+
+	var errores []string
+
+	Query := "UPDATE libros SET Titulo = ?, Autor = ?, Año_publicacion = ?, Favorito = ? WHERE Libro_ID = ? AND Usuario_ID = ?;"
+
+	if err := c.ShouldBindJSON(&libro); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos de entrada inválidos"})
+		return
+	}
+
+	//Validaciones para verificar si el libro tiene los datos necesarios
+	if libro.TituloLibro == "" {
+		errores = append(errores, "Se debe ubicar un título de libro")
+	}
+	if libro.AutorLibro == "" {
+		errores = append(errores, "Se debe ubicar un autor del libro")
+	}
+
+	if len(errores) > 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": errores})
+		return
+	}
+
+	_, err := DB.Exec(Query, libro.TituloLibro, libro.AutorLibro, libro.FechaPublicacion, libro.Favorito, LibroID, UsuarioID)
+	if err != nil {
+		log.Println("Error al acutlaizar el libro", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al actualizar el libro"})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Libro actualizado exitosamente",
+		"libro":   libro,
+	})
+}
+
 func GetLibroById(c *gin.Context) {
 
 	UsuarioID := c.Param("usuario_id")
