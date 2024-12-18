@@ -34,13 +34,11 @@ func PostUsuario(c *gin.Context) {
 
 	var errores []string
 
-	// Pasar el formato JSON a la estructura del usuario
 	if err := c.ShouldBindJSON(&usuario); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos de entrada inválidos"})
 		return
 	}
 
-	// Validaciones para verificar si el email ya ha sido usado
 	var count int
 	err := DB.QueryRow("SELECT COUNT(*) FROM usuario WHERE Email = ?;", usuario.Email).Scan(&count)
 	if err != nil {
@@ -54,7 +52,6 @@ func PostUsuario(c *gin.Context) {
 		return
 	}
 
-	// Validaciones para verificar si el nombre de usuario ya existe
 	err = DB.QueryRow("SELECT COUNT(*) FROM usuario WHERE Nombre_usuario = ?;", usuario.NombreUsuario).Scan(&count)
 	if err != nil {
 		log.Println("Error al verificar si el usuario existe: ", err)
@@ -65,8 +62,6 @@ func PostUsuario(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error:": "Este nombre de usuario ya ha sido utilizado"})
 		return
 	}
-
-	//Validaciones para verificar si los datos han sido ubicados correctamente
 
 	if usuario.NombreUsuario == "" {
 		errores = append(errores, "Se debe ubicar un nombre de usuario")
@@ -80,7 +75,6 @@ func PostUsuario(c *gin.Context) {
 		return
 	}
 
-	// Inserción del usuario en la base de datos
 	_, err = DB.Exec("INSERT INTO usuario (Nombre_usuario, Password_usuario, Email) VALUES (?, ?, ?);", usuario.NombreUsuario, usuario.PasswordUsuario, usuario.Email)
 	if err != nil {
 		log.Println("Error al insertar el usuario:", err)
@@ -140,7 +134,6 @@ func DeleteUsuario(c *gin.Context) {
 
 	Query := "SELECT COUNT(*) FROM usuario WHERE Usuario_ID = ?"
 
-	//Verifica si el usuario existe antes de eliminarlo
 	var count int
 	err := DB.QueryRow(Query, UsuarioID).Scan(&count)
 	if err != nil {
@@ -155,7 +148,6 @@ func DeleteUsuario(c *gin.Context) {
 
 	Query = "DELETE FROM usuario WHERE Usuario_ID = ?"
 
-	//Ejecución del Query
 	_, err = DB.Exec(Query, UsuarioID)
 	if err != nil {
 		log.Println("Error al eliminar el usuario", err)

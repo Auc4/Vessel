@@ -24,4 +24,8 @@ func SetUpRoutes(router *gin.Engine) {
 		libro.DELETE("/borrar_libro/:usuario_id/:libro_id", controllers.DeleteLibro)
 	}
 
+	categoria := router.Group("/api/categoria")
+	{
+		categoria.GET("/obtener_categorias", controllers.GetCategorias)
+	}
 }

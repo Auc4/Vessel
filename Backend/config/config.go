@@ -13,7 +13,7 @@ var DB *sql.DB
 // ConnectDB maneja la conexión a la base de datos y la retorna
 func ConnectDB() *sql.DB {
 	// Configura la conexión: usuario, contraseña, servidor y nombre de la base de datos
-	dsn := "root:Auca.123.Mysql-14@tcp(localhost:3306)/Vessel"
+	dsn := "vessel_user:Vessel.Pass.w0rd-24@tcp(localhost:3306)/Vessel"
 
 	// Abre la conexión
 	db, err := sql.Open("mysql", dsn)
