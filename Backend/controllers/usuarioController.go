@@ -12,11 +12,11 @@ func GetUsuarioByID(c *gin.Context) {
 
 	var usuario entities.Usuario
 
-	Query := "SELECT Nombre_usuario, Password_usuario, Email FROM usuario WHERE Usuario_ID = ?;"
+	Query := "SELECT Usuario_ID, Nombre_usuario, Password_usuario, Email FROM usuario WHERE Usuario_ID = ?;"
 
 	UsuarioID := c.Param("id")
 
-	err := DB.QueryRow(Query, UsuarioID).Scan(&usuario.NombreUsuario, &usuario.PasswordUsuario, &usuario.Email)
+	err := DB.QueryRow(Query, UsuarioID).Scan(&usuario.UsuarioID, &usuario.NombreUsuario, &usuario.PasswordUsuario, &usuario.Email)
 
 	if err != nil {
 		log.Println("Error al consultar los datos del usuario", err)

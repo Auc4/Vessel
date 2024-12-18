@@ -15,7 +15,7 @@ func GetLibros(c *gin.Context) {
 
 	UsuarioID := c.Param("id")
 
-	Query := "SELECT Titulo, Autor, Año_publicacion, favorito FROM usuario INNER JOIN libros ON usuario.Usuario_ID = libros.Usuario_ID WHERE usuario.Usuario_ID = ?;"
+	Query := "SELECT Libro_ID, Titulo, Autor, Año_publicacion, Favorito FROM usuario INNER JOIN libros ON usuario.Usuario_ID = libros.Usuario_ID WHERE usuario.Usuario_ID = ?;"
 
 	var libros []entities.Libro
 
@@ -30,7 +30,7 @@ func GetLibros(c *gin.Context) {
 	defer rows.Close()
 
 	for rows.Next() {
-		if err := rows.Scan(&libro.TituloLibro, &libro.AutorLibro, &libro.FechaPublicacion, &libro.Favorito); err != nil {
+		if err := rows.Scan(&libro.LibroID, &libro.TituloLibro, &libro.AutorLibro, &libro.FechaPublicacion, &libro.Favorito); err != nil {
 			log.Println("Error al leer los datos de los libros:", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al procesar los libros"})
 			return
@@ -98,8 +98,6 @@ func PutLibro(c *gin.Context) {
 	UsuarioID := c.Param("usuario_id")
 	LibroID := c.Param("libro_id")
 
-	var libro entities.Libro
-
 	var errores []string
 
 	Query := "UPDATE libros SET Titulo = ?, Autor = ?, Año_publicacion = ?, Favorito = ? WHERE Libro_ID = ? AND Usuario_ID = ?;"
@@ -148,18 +146,20 @@ func GetLibroById(c *gin.Context) {
             Año_publicacion, 
             Favorito,
             GROUP_CONCAT(categoria.Descripcion_categoria) AS Etiquetas
+
         FROM 
             libros
 
         LEFT JOIN 
             categorialibro ON libros.Libro_ID = categorialibro.Libro_ID
+
         LEFT JOIN 
             categoria ON categorialibro.Categoria_ID = categoria.Categoria_ID
         
 		WHERE libros.Usuario_ID = ? AND libros.Libro_ID = ?
         
 		GROUP BY libros.Libro_ID;
-    `
+    	`
 
 	row := DB.QueryRow(Query, UsuarioID, LibroID)
 
@@ -184,7 +184,7 @@ func DeleteLibro(c *gin.Context) {
 	UsuarioID := c.Param("usuario_id")
 	LibroID := c.Param("libro_id")
 
-	Query := "DELETE FROM libros WHERE Libro_ID = ? AND Usuario_ID = ?"
+	Query := "DELETE FROM libros WHERE Libro_ID = ? AND Usuario_ID = ?;"
 	result, err := DB.Exec(Query, LibroID, UsuarioID)
 	if err != nil {
 		log.Println("Error al eliminar el libro:", err)

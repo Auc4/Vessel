@@ -1,6 +1,7 @@
 package entities
 
 type Libro struct {
+	LibroID          string `json:"libro_ID"`
 	Usuario_ID       int    `json:"usuario_ID"`
 	TituloLibro      string `json:"titulo"`
 	AutorLibro       string `json:"autor"`
